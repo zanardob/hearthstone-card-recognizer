@@ -44,7 +44,7 @@ def main():
 
         screenshot = cv.polylines(screenshot, [np.int32(dst)], True, 255, 3, cv.LINE_AA)
     else:
-        print("Not enough good matches were found - %d/%d" % len(good), MIN_MATCH_COUNT)
+        print("Not enough good matches were found - %d/%d" % (len(good), MIN_MATCH_COUNT))
         matchesMask = None
 
     draw_params = dict(matchColor=(0, 255, 0),

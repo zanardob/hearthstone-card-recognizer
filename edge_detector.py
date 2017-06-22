@@ -10,7 +10,7 @@ def main():
 
     # Pre-processing: Convert frame to standard size, 1024x768
     screenshot = cv.imread(sys.argv[1], 0)
-    # screenshot = cv.medianBlur(screenshot, 9)
+    screenshot = cv.medianBlur(screenshot, 9)
 
     kernelGauss = np.array([[0.0625, 0.125, 0.0625], [0.125, 0.25, 0.125], [0.0625, 0.125, 0.0625]])
     kernelLaplacian = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
