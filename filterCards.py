@@ -8,10 +8,10 @@ class mydict(dict):
 
 
 wild = False
-downloadCards = False
+downloadCards = True
 typeFilteredCards = []
 
-with open('all_cards.json') as allCardsFile:
+with open('all_cards_fixed_standard.json') as allCardsFile:
 	allCardsObject = mydict(json.load(allCardsFile))
 	allCards = []
 
