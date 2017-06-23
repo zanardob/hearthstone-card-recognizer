@@ -1,16 +1,14 @@
-# These code snippets use an open-source library. http://unirest.io/python
-import requests
 import json
+import requests
+import json_dict as jd
 
-class mydict(dict):
-	def __str__(self):
-		return json.dumps(self)
-
-request = requests.get(url="https://omgvamp-hearthstone-v1.p.mashape.com/cards",
-  headers={
-    "X-Mashape-Key": "55TXAeirFtmshkebdKTpo9Fvrwn2p1QxjyAjsnBVzqijA8Mv5z"
-  }
-)
+request = requests.get(url=
+                       "https://omgvamp-hearthstone-v1.p.mashape.com/cards",
+                       headers={
+                           "X-Mashape-Key":
+                           "55TXAeirFtmshkebdKTpo9Fvrwn2p1QxjyAjsnBVzqijA8Mv5z"
+                       }
+                       )
 
 with open('all_cards.json', 'w') as cardsfile:
-	cardsfile.write(str(mydict(json.loads(request.text))))
+    cardsfile.write(str(jd.jdict(json.loads(request.text))))

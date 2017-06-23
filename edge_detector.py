@@ -3,6 +3,7 @@ import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as pl
 
+
 def main():
     if len(sys.argv) != 2:
         print("usage %s screenshot" % sys.argv[0])
@@ -38,6 +39,7 @@ def main():
     pl.imshow(edges, cmap='gray')
 
     pl.show()
+
 
 if __name__ == '__main__':
     main()
