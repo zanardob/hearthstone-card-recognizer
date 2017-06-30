@@ -6,6 +6,66 @@ import json_dict as jd
 import card_crops as cc
 
 
+def hand_counter(board, screenshot):
+    mask_names = [
+        "masks/mask_0_cards.png",
+        "masks/mask_1_cards.png",
+        "masks/mask_2_cards.png",
+        "masks/mask_3_cards.png",
+        "masks/mask_4_cards.png",
+        "masks/mask_5_cards.png",
+        "masks/mask_6_cards.png",
+        "masks/mask_7_cards.png",
+        "masks/mask_8_cards.png",
+        "masks/mask_9_cards.png",
+        "masks/mask_10_cards.png",
+    ]
+
+    board = cv.imread(board['img'])
+    board = cv.blur(board, (5, 5))
+    screenshot = cv.blur(screenshot, (5, 5))
+    subtraction = np.subtract(board[930:1080, 584:1240], screenshot[930:1080, 584:1240])
+
+    limit = 40
+    for row in subtraction:
+        for pixel in row:
+            b, g, r = pixel[0], pixel[1], pixel[2]
+            if((b < limit) or (b > (255 - limit))):
+                pixel[0] = 0
+                b = 0
+            if((g < limit) or (g > (255 - limit))):
+                pixel[1] = 0
+                g = 0
+            if((r < limit) or (r > (255 - limit))):
+                pixel[2] = 0
+                r = 0
+
+            sum = int(b) + int(g) + int(r)
+            if sum < limit*3:
+                pixel[0], pixel[1], pixel[2] = 0, 0, 0
+            else:
+                pixel[0], pixel[1], pixel[2] = 255, 255, 255
+
+    hits = [0] * 11
+    for maskid, mask_name in enumerate(mask_names):
+        mask = cv.imread(mask_name, 0)
+
+        for rowid, row in enumerate(subtraction):
+            for pixelid, pixel in enumerate(row):
+                if pixel[0] == mask[rowid][pixelid]:
+                    hits[maskid] += 1;
+        print(mask_name + ' hits: ' + str(hits[maskid]))
+
+    maxHit = 0
+    bestHit = 0
+    for i, hit in enumerate(hits):
+        if hit > maxHit:
+            bestHit = i
+            maxHit = hit
+
+    return bestHit
+
+
 def minion_counter(board, screenshot):
     # Subtract the board from the screenshot to remove background
     subtracted = cv.imread(board['img'], 0)
@@ -158,11 +218,13 @@ def main():
     # Read the scene passed
     screenshot = cv.imread(sys.argv[1], 0)
 
-    # Cropping the scene to get the cards at hand
-    hand_imgs = cc.crops(screenshot).get_hand_crop(int(sys.argv[2]))
-
     # Recognizing the board being played on
     board = board_recognizer(screenshot)
+
+    # Cropping the scene to get the cards at hand
+    card_count = hand_counter(board, screenshot)
+    hand_imgs = cc.crops(screenshot).get_hand_crop(card_count)
+    # hand_imgs = cc.crops(screenshot).get_hand_crop(int(sys.argv[2]))
 
     # Getting the minions in play
     minion_imgs = minion_counter(board, screenshot)
