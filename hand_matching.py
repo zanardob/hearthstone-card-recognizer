@@ -53,7 +53,7 @@ def hand_counter(board, screenshot):
         for rowid, row in enumerate(subtraction):
             for pixelid, pixel in enumerate(row):
                 if pixel[0] == mask[rowid][pixelid]:
-                    hits[maskid] += 1;
+                    hits[maskid] += 1
         print(mask_name + ' hits: ' + str(hits[maskid]))
 
     maxHit = 0
