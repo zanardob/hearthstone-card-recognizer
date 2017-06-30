@@ -248,25 +248,23 @@ def main():
     my_minion_imgs = minion_counter(board, screenshot)
     opponent_minion_imgs = minion_counter(board, screenshot, True)
 
-    # # Recognizing each card on the hand of the player
-    # print('Now recognizing cards in player\'s hand...')
-    # hand = card_recognizer(hand_imgs, cards_json)
-    # print('Cards currently at hand:')
-    # for card in hand:
-    #     print('\t(' + card['cardId'] + ') ' + card['name'])
+    # Recognizing each card on the hand of the player
+    print('Now recognizing cards in player\'s hand...')
+    hand = card_recognizer(hand_imgs, cards_json)
+    print('Cards currently at hand:')
+    for card in hand:
+        print('\t(' + card['cardId'] + ') ' + card['name'])
 
     # Recognizing each minion in play
     print('Now recognizing minions on the player\'s board...')
     minions = card_recognizer(my_minion_imgs, cards_json, True)
     print('There are ' + str(len(minions)) + ' minions on the player\'s board.')
-    print('Minions on the player\'s board:')
     for minion in minions:
         print('\t(' + minion['cardId'] + ') ' + minion['name'])
 
     print('Now recognizing minions on the opponent\'s board...')
-    print('There are ' + str(len(minions)) + ' minions on the opponent\'s board.')
     minions = card_recognizer(opponent_minion_imgs, cards_json, True)
-    print('Minions on the opponent\'s board:')
+    print('There are ' + str(len(minions)) + ' minions on the opponent\'s board.')
     for minion in minions:
         print('\t(' + minion['cardId'] + ') ' + minion['name'])
 
