@@ -7,7 +7,7 @@ import json_dict as jd
 def main():
     sift = cv.xfeatures2d.SIFT_create()
 
-    with open('std_cards_list.json', 'r') as cards_file:
+    with open('JSON/std_cards_list.json', 'r') as cards_file:
         cards_json = jd.jdict(json.load(cards_file))
 
     total = len(cards_json['cards'])
@@ -24,7 +24,7 @@ def main():
         percentage = int((index / total * 100))
         print('(' + str(percentage) + '%) ' + card['name'])
 
-    with open('std_cards_list_descriptors.json', 'w') as cards_file:
+    with open('JSON/std_cards_list_descriptors.json', 'w') as cards_file:
         cards_file.write(str(cards_json))
 
 

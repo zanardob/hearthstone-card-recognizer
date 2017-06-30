@@ -8,7 +8,7 @@ wild = False
 downloadCards = True
 typeFilteredCards = []
 
-with open('all_cards_fixed_standard.json', 'r') as allCardsFile:
+with open('JSON/all_cards_fixed_standard.json', 'r') as allCardsFile:
     allCardsObject = jd.jdict(json.load(allCardsFile))
     allCards = []
 
@@ -63,8 +63,8 @@ if downloadCards:
 
 filteredCardsObject = jd.jdict({'cards': typeFilteredCards})
 if wild:
-    with open('wild_cards_list.json', 'w') as wildCardsFile:
+    with open('JSON/wild_cards_list.json', 'w') as wildCardsFile:
         wildCardsFile.write(str(filteredCardsObject))
 else:
-    with open('std_cards_list.json', 'w') as stdCardsFile:
+    with open('JSON/std_cards_list.json', 'w') as stdCardsFile:
         stdCardsFile.write(str(filteredCardsObject))

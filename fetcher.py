@@ -13,5 +13,5 @@ request = requests.get(url=
                        }
                        )
 
-with open('all_cards.json', 'w') as cardsfile:
+with open('JSON/all_cards.json', 'w') as cardsfile:
     cardsfile.write(str(jd.jdict(json.loads(request.text))))

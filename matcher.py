@@ -34,7 +34,6 @@ def hand_counter(board, screenshot):
 
     limit = 40
 
-#    This section is only for RGB background images only
     for row in subtraction:
         for pixel in row:
             # Apply a threshold in each individual RGB value, needed after the subtraction
@@ -66,7 +65,8 @@ def hand_counter(board, screenshot):
                 if pixel[0] == mask[rowid][pixelid]:
                     hits[maskid] += 1
 
-    # The mask that best describes the processed hand image should tell us how many cards are in the player's hand
+    # The mask that best describes the processed hand image
+    # should tell us how many cards are in the player's hand
     maxHit = 0
     bestHit = 0
     for i, hit in enumerate(hits):
@@ -77,7 +77,7 @@ def hand_counter(board, screenshot):
     return bestHit
 
 
-def minion_counter(board, screenshot):
+def minion_counter(board, screenshot, opponent_minions=False):
     # Subtract the board from the screenshot to remove background
     subtracted = cv.imread(board['img'], 0)
     subtracted = np.subtract(screenshot, subtracted)
@@ -89,8 +89,12 @@ def minion_counter(board, screenshot):
     _, thresh_img = cv.threshold(thresh_img, 1, 255, cv.THRESH_BINARY)
 
     # Crop the scene and threshold according to possible minion positions
-    candidates = cc.crops(screenshot).get_minion_crop()
-    thresh_imgs = cc.crops(thresh_img).get_minion_crop()
+    if not opponent_minions:
+        candidates = cc.crops(screenshot).get_minion_crop(cc.crops.MINE)
+        thresh_imgs = cc.crops(thresh_img).get_minion_crop(cc.crops.MINE)
+    else:
+        candidates = cc.crops(screenshot).get_minion_crop(cc.crops.OPPONENT)
+        thresh_imgs = cc.crops(thresh_img).get_minion_crop(cc.crops.OPPONENT)
 
     # Setup kernel for the upcoming erosion
     kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (100, 100))
@@ -222,7 +226,7 @@ def main():
         print("usage: %s scene" % sys.argv[0])
         sys.exit(1)
 
-    with open('std_cards_list_descriptors.json', 'r') as cards_file:
+    with open('JSON/std_cards_list_descriptors.json', 'r') as cards_file:
         cards_json = jd.jdict(json.load(cards_file))
 
     # Read the scene passed
@@ -237,24 +241,32 @@ def main():
     # Cropping the scene to get the cards at hand
     print('Now counting cards in the player\'s hand...')
     card_count = hand_counter(board, screenshot_color)
-    print('There are ' + str(card_count) + ' in the player\'s hand.')
+    print('There are ' + str(card_count) + ' cards in the player\'s hand.')
     hand_imgs = cc.crops(screenshot).get_hand_crop(card_count)
-    # hand_imgs = cc.crops(screenshot).get_hand_crop(int(sys.argv[2]))
 
     # Getting the minions in play
-    minion_imgs = minion_counter(board, screenshot)
+    my_minion_imgs = minion_counter(board, screenshot)
+    opponent_minion_imgs = minion_counter(board, screenshot, True)
 
-    # Recognizing each card on the hand of the player
-    print('Now recognizing cards in player\'s hand...')
-    #hand = card_recognizer(hand_imgs, cards_json)
-    print('Cards currently at hand:')
-    for card in hand:
-        print('\t(' + card['cardId'] + ') ' + card['name'])
+    # # Recognizing each card on the hand of the player
+    # print('Now recognizing cards in player\'s hand...')
+    # hand = card_recognizer(hand_imgs, cards_json)
+    # print('Cards currently at hand:')
+    # for card in hand:
+    #     print('\t(' + card['cardId'] + ') ' + card['name'])
 
     # Recognizing each minion in play
-    print('Now recognizing minions on the board...')
-    minions = card_recognizer(minion_imgs, cards_json, True)
-    print('Minions currently on the board:')
+    print('Now recognizing minions on the player\'s board...')
+    minions = card_recognizer(my_minion_imgs, cards_json, True)
+    print('There are ' + str(len(minions)) + ' minions on the player\'s board.')
+    print('Minions on the player\'s board:')
+    for minion in minions:
+        print('\t(' + minion['cardId'] + ') ' + minion['name'])
+
+    print('Now recognizing minions on the opponent\'s board...')
+    print('There are ' + str(len(minions)) + ' minions on the opponent\'s board.')
+    minions = card_recognizer(opponent_minion_imgs, cards_json, True)
+    print('Minions on the opponent\'s board:')
     for minion in minions:
         print('\t(' + minion['cardId'] + ') ' + minion['name'])
 
