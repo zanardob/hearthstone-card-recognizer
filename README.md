@@ -17,10 +17,12 @@ The screenshots were obtained by playing the game and capturing them in differen
 The database of cards was created by using the [Hearthstone API](http://hearthstoneapi.com) service, which provides a JSON with information about all the cards on the game. We then filtered the JSON so that we could fetch only the currently playable cards on the standard format, which excludes cards older than 2 years. Finally, we downloaded each of the cards on the filtered JSON to create our database.
 
 Figure 1 is an example of the type of screenshots that were used. Note how the monsters can have different shapes and particle effects, and also how the cards in your hand get rotated and more grouped together as you draw more.
+
 ![Game board](http://i.imgur.com/yJfGk1h.jpg)  
 Figure 1 - The board of the game Hearthstone.
 
 On Figure 2 we have an example of the images that compose our card database. They are matched against the screenshots previously shown. Also note how the scales of the images are very different, and how once a monster is played, only its picture is shown on the board (creating another challenge).
+
 ![Sorcerer's Apprentice](http://i.imgur.com/r63YQ4x.png)  
 Figure 2 - One of the playable cards in Hearthstone.
 
@@ -44,6 +46,7 @@ In order to count the number of cards in the player's hand and the number of min
 The first step the program takes as soon as it reads an input image is to find what board that match takes place on. A small window is cropped off from each of the boards as well as from the input image itself. Then the program compares them to know what is the most likely board in that match.
 
 The process of determining how many cards are in the player's hand is given by a simple algorithm. First, a cropped and blurred space of the input image is subtracted from the board image of that game (cropped and blurred as well). That should give us really dark or really bright pixels where the intensities of both images were similar. Those pixels are probably not cards, because cards usually have different colors than the board behind them. That being said, we applied a threshold for really dark or bright pixels, making them black, while the remaining pixels were set to white. Figure 3 shows an example of this result. We then tested this image against every hand size mask (those premade masks can be found in the `Mask` folder). The mask that best described the result of the subtracted images tells us how many cards the player has in their hand.
+
 ![Mask](http://i.imgur.com/Bxhd6LQ.png)  
 Figure 3 - The player's hand after basic processing.
 
@@ -59,10 +62,11 @@ We were really satisfied with the accuracy of the project. We obtained no mismat
 That happens because we try and compare every card of the hand and board with all the cards of the database and select the one with the most correct matches. Unfortunately this leads to a very slow run time, therefore the program still cannot be used in real time while playing the game. It takes roughly 4 minutes to parse all the information described above.
 
 Figures 4 and 5 are examples of the outputs of our project. It firstly informs the game board being played on, then the cards on the player's board, and lastly the cards on the opponent's board. All of the matches were accurate, with no mismatches.
+
 ![Match 1](http://i.imgur.com/QqPytMw.jpg)  
 Figure 4 - Output of our project.
 
-![Match 2](http://i.imgur.com/E82fjGA.jpg)
+![Match 2](http://i.imgur.com/E82fjGA.jpg)  
 Figure 5 - Another output, this time with a lot of cards on the board and also on the player's hand.
 
 ## Demo Code
