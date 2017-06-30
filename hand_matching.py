@@ -7,55 +7,66 @@ import card_crops as cc
 
 
 def hand_counter(board, screenshot):
+    # This is a list of masks representing each possible number of cards in the player's hand.
+    # Check the Mask folder for a visual idea of what they look like
     mask_names = [
-        "masks/mask_0_cards.png",
-        "masks/mask_1_cards.png",
-        "masks/mask_2_cards.png",
-        "masks/mask_3_cards.png",
-        "masks/mask_4_cards.png",
-        "masks/mask_5_cards.png",
-        "masks/mask_6_cards.png",
-        "masks/mask_7_cards.png",
-        "masks/mask_8_cards.png",
-        "masks/mask_9_cards.png",
-        "masks/mask_10_cards.png",
+        "Mask/0cards.png",
+        "Mask/1card.png",
+        "Mask/2cards.png",
+        "Mask/3cards.png",
+        "Mask/4cards.png",
+        "Mask/5cards.png",
+        "Mask/6cards.png",
+        "Mask/7cards.png",
+        "Mask/8cards.png",
+        "Mask/9cards.png",
+        "Mask/10cards.png"
     ]
 
-    board = cv.imread(board['img'])
+    board = cv.imread(board['img']) # RGB
+
+    # Blurring the images so that some small differences disappear in the subtraction
     board = cv.blur(board, (5, 5))
     screenshot = cv.blur(screenshot, (5, 5))
+
+    # Subtracting the slice of the hand's player with the empty board template to count cards
     subtraction = np.subtract(board[930:1080, 584:1240], screenshot[930:1080, 584:1240])
 
     limit = 40
+
+#    This section is only for RGB background images only
     for row in subtraction:
         for pixel in row:
+            # Apply a threshold in each individual RGB value, needed after the subtraction
             b, g, r = pixel[0], pixel[1], pixel[2]
-            if((b < limit) or (b > (255 - limit))):
+            if b < limit or b > 255 - limit:
                 pixel[0] = 0
                 b = 0
-            if((g < limit) or (g > (255 - limit))):
+            if g < limit or g > 255 - limit:
                 pixel[1] = 0
                 g = 0
-            if((r < limit) or (r > (255 - limit))):
+            if r < limit or r > 255 - limit:
                 pixel[2] = 0
                 r = 0
 
+            # If the pixel is no longer relevant, make it black. Otherwise, make it white
             sum = int(b) + int(g) + int(r)
             if sum < limit*3:
                 pixel[0], pixel[1], pixel[2] = 0, 0, 0
             else:
                 pixel[0], pixel[1], pixel[2] = 255, 255, 255
 
+    # Now, each mask will be tested with the processed hand image
+    # If a pixel is equal in both images, it's a hit, otherwise it's not
     hits = [0] * 11
     for maskid, mask_name in enumerate(mask_names):
         mask = cv.imread(mask_name, 0)
-
         for rowid, row in enumerate(subtraction):
             for pixelid, pixel in enumerate(row):
                 if pixel[0] == mask[rowid][pixelid]:
                     hits[maskid] += 1
-        print(mask_name + ' hits: ' + str(hits[maskid]))
 
+    # The mask that best describes the processed hand image should tell us how many cards are in the player's hand
     maxHit = 0
     bestHit = 0
     for i, hit in enumerate(hits):
@@ -206,10 +217,9 @@ def card_recognizer(cards_imgs, cards_json, minions_only=False):
 
     return results
 
-
 def main():
-    if len(sys.argv) != 3:
-        print("usage %s scene number_of_cards" % sys.argv[0])
+    if len(sys.argv) != 2:
+        print("usage: %s scene" % sys.argv[0])
         sys.exit(1)
 
     with open('std_cards_list_descriptors.json', 'r') as cards_file:
@@ -217,12 +227,17 @@ def main():
 
     # Read the scene passed
     screenshot = cv.imread(sys.argv[1], 0)
+    screenshot_color = cv.imread(sys.argv[1])
 
     # Recognizing the board being played on
+    print('Now trying to recognize the board...')
     board = board_recognizer(screenshot)
+    print('The current board is ' + board['name'] + '.')
 
     # Cropping the scene to get the cards at hand
-    card_count = hand_counter(board, screenshot)
+    print('Now counting cards in the player\'s hand...')
+    card_count = hand_counter(board, screenshot_color)
+    print('There are ' + str(card_count) + ' in the player\'s hand.')
     hand_imgs = cc.crops(screenshot).get_hand_crop(card_count)
     # hand_imgs = cc.crops(screenshot).get_hand_crop(int(sys.argv[2]))
 
@@ -230,15 +245,15 @@ def main():
     minion_imgs = minion_counter(board, screenshot)
 
     # Recognizing each card on the hand of the player
-    hand = card_recognizer(hand_imgs, cards_json)
-
-    # Recognizing each minion in play
-    minions = card_recognizer(minion_imgs, cards_json, True)
-
-    print('The current board is ' + board['name'] + '.')
+    print('Now recognizing cards in player\'s hand...')
+    #hand = card_recognizer(hand_imgs, cards_json)
     print('Cards currently at hand:')
     for card in hand:
         print('\t(' + card['cardId'] + ') ' + card['name'])
+
+    # Recognizing each minion in play
+    print('Now recognizing minions on the board...')
+    minions = card_recognizer(minion_imgs, cards_json, True)
     print('Minions currently on the board:')
     for minion in minions:
         print('\t(' + minion['cardId'] + ') ' + minion['name'])
