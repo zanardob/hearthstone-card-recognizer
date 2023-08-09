@@ -2,9 +2,7 @@
 Board recognizer for the game Hearthstone using image processing methods.  
 
 ###### Authors
-* Danilo de Moraes Costa - NUSP 8921972
-* Guilherme Zanardo Borduchi - NUSP 8937458
-* Lucas Silveira de Moura - NUSP 8937267
+Danilo, Guilherme, Lucas
 
 ## Project Objective
 Hearthstone is a popular collectible card game, launched in 2014, with more than 70 million unique players. With more than 1000 playing cards, our project aims to process an image from the playing board, and try to detect which cards you are holding, which monsters and weapons are on board and how many cards your oponent has, from which point it will be possible to present various informations to the user, such as who is currently winning the game, what combination of cards can be played and how can the monsters interact.
