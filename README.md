@@ -1,7 +1,7 @@
 # Hearthstone Card Recognizer
 Board recognizer for the game Hearthstone using image processing methods.  
 
-###### Authors
+### Authors
 Danilo, Guilherme, Lucas
 
 ## Project Objective
